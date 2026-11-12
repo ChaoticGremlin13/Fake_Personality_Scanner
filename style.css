@@ -1,0 +1,62 @@
+body {
+
+    background-color: #0d0d0d;
+
+    color: lime;
+
+    font-family: monospace;
+
+    padding: 30px;
+}
+
+h1 {
+
+    margin-bottom: 20px;
+}
+
+textarea {
+
+    width: 400px;
+
+    height: 150px;
+
+    background-color: black;
+
+    color: lime;
+
+    border: 2px solid lime;
+
+    padding: 10px;
+
+    font-size: 16px;
+}
+
+button {
+
+    display: block;
+
+    margin-top: 20px;
+
+    padding: 10px 20px;
+
+    background-color: lime;
+
+    color: black;
+
+    border: none;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#results {
+
+    margin-top: 30px;
+
+    border: 1px solid lime;
+
+    padding: 20px;
+
+    width: 400px;
+}

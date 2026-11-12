@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Fake Personality Scanner</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <style>
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+        }
+
+        body {
+
+            font-family: monospace;
+
+            overflow-x: hidden;
+
+            padding: 30px;
+
+            transition: 0.4s;
+        }
+
+        #matrixCanvas {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            z-index: -1;
+        }
+
+        h1 {
+
+            margin-bottom: 10px;
+
+            font-size: 40px;
+        }
+
+  #disclaimer {
+
+    margin-bottom: 25px;
+
+    max-width: 700px;
+
+    line-height: 1.7;
+
+    opacity: 0.85;
+
+    font-size: 14px;
+
+    color: white;
+}
+
+        select {
+
+            padding: 10px;
+
+            margin-bottom: 20px;
+
+            font-size: 16px;
+
+            border-radius: 10px;
+        }
+
+        textarea {
+
+            width: 100%;
+
+            max-width: 550px;
+
+            height: 160px;
+
+            padding: 15px;
+
+            font-size: 16px;
+
+            resize: none;
+
+            margin-top: 10px;
+
+            border-radius: 10px;
+        }
+
+        button {
+
+            padding: 12px 20px;
+
+            border: none;
+
+            margin-top: 20px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            border-radius: 10px;
+
+            transition: 0.3s;
+        }
+
+        button:hover {
+
+            transform: scale(1.04);
+        }
+
+        #loading {
+
+            margin-top: 20px;
+
+            line-height: 2;
+        }
+
+        #results {
+
+            margin-top: 30px;
+
+            padding: 20px;
+
+            width: 100%;
+
+            max-width: 600px;
+
+            border-radius: 15px;
+
+            display: none;
+
+            backdrop-filter: blur(6px);
+        }
+
+        canvas {
+
+            margin-top: 30px;
+
+            border-radius: 10px;
+
+            padding: 10px;
+
+            max-width: 100%;
+        }
+
+        #card {
+
+            margin-top: 30px;
+
+            padding: 20px;
+
+            border-radius: 15px;
+        }
+
+        #downloadBtn {
+
+            margin-top: 20px;
+        }
+
+
+
+        /* EVIL LAB */
+
+        .lab {
+
+            background: black;
+
+            color: #bb66ff;
+        }
+
+        .lab textarea {
+
+            background: #14001f;
+
+            color: #d896ff;
+
+            border: 2px solid #bb66ff;
+        }
+
+        .lab button {
+
+            background: #7a00cc;
+
+            color: white;
+        }
+
+        .lab select {
+
+            background: #14001f;
+
+            color: #d896ff;
+
+            border: 2px solid #bb66ff;
+        }
+
+        .lab #results,
+        .lab #card {
+
+            border: 2px solid #bb66ff;
+
+            background: rgba(20, 0, 30, 0.8);
+        }
+
+
+
+        /* CORPORATE */
+
+        .corporate {
+
+            background: black;
+
+            color: #00ccff;
+        }
+
+        .corporate textarea {
+
+            background: #06141a;
+
+            color: #00ccff;
+
+            border: 2px solid #00ccff;
+        }
+
+        .corporate button {
+
+            background: #0088ff;
+
+            color: white;
+        }
+
+        .corporate select {
+
+            background: #06141a;
+
+            color: #00ccff;
+
+            border: 2px solid #00ccff;
+        }
+
+        .corporate #results,
+        .corporate #card {
+
+            border: 2px solid #00ccff;
+
+            background: rgba(0, 20, 30, 0.8);
+        }
+
+
+
+        /* GOVERNMENT */
+
+        .government {
+
+            background: black;
+
+            color: #00ff66;
+        }
+
+        .government textarea {
+
+            background: #001a08;
+
+            color: #00ff66;
+
+            border: 2px solid #00ff66;
+        }
+
+        .government button {
+
+            background: #00aa44;
+
+            color: black;
+        }
+
+        .government select {
+
+            background: #001a08;
+
+            color: #00ff66;
+
+            border: 2px solid #00ff66;
+        }
+
+        .government #results,
+        .government #card {
+
+            border: 2px solid #00ff66;
+
+            background: rgba(0, 20, 0, 0.8);
+        }
+
+    </style>
+
+</head>
+
+<body class="lab">
+
+    <canvas id="matrixCanvas"></canvas>
+
+    <h1>CLASSIFIED PERSONALITY ANALYZER</h1>
+
+    <p id="disclaimer">
+
+        DISCLAIMER:
+        This website is completely satirical and made purely for fun.
+        None of the scans, charts, scores, behavioral analyses,
+        threat levels, or personality results are scientifically accurate.
+        The system uses random weighted logic, fake terminology,
+        and exaggerated analysis for entertainment purposes only.
+        It is not meant to insult, target, diagnose,
+        or hurt anyone in any way.
+        Please do not make life decisions based on raccoon-powered fake AI.
+        Humanity already struggles enough.
+
+    </p>
+
+    <select id="themeSelector">
+
+        <option value="lab">
+
+            Evil Laboratory
+
+        </option>
+
+        <option value="corporate">
+
+            Corporate Scam AI
+
+        </option>
+
+        <option value="government">
+
+            Government Classified
+
+        </option>
+
+    </select>
+
+    <br>
+
+    <textarea
+        id="userInput"
+        placeholder="Enter subject behavioral data..."
+    ></textarea>
+
+    <br>
+
+    <button id="scanBtn">
+
+        RUN CHAOS SCAN
+
+    </button>
+
+    <div id="loading"></div>
+
+    <div id="results">
+
+        <h2>THREAT ANALYSIS COMPLETE</h2>
+
+        <br>
+
+        <p id="goblinText"></p>
+
+        <p id="villainText"></p>
+
+        <p id="sleepText"></p>
+
+        <p id="diagnosis"></p>
+
+        <br>
+
+        <p id="threatLevel"></p>
+
+        <canvas id="radarChart"></canvas>
+
+        <canvas id="pieChart"></canvas>
+
+        <canvas id="lineChart"></canvas>
+
+        <div id="card">
+
+            <h2>YOUR RESULTS</h2>
+
+            <br>
+
+            <p id="cardGoblin"></p>
+
+            <p id="cardVillain"></p>
+
+            <p id="cardSleep"></p>
+
+            <p id="cardThreat"></p>
+
+            <button id="downloadBtn">
+
+                DOWNLOAD RESULT CARD
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const body = document.body;
+
+        const themeSelector =
+            document.getElementById("themeSelector");
+
+        const button =
+            document.getElementById("scanBtn");
+
+        const input =
+            document.getElementById("userInput");
+
+        const loading =
+            document.getElementById("loading");
+
+        const results =
+            document.getElementById("results");
+
+        const card =
+            document.getElementById("card");
+
+
+
+        let radarChart;
+        let pieChart;
+        let lineChart;
+
+
+
+        themeSelector.addEventListener(
+
+            "change",
+
+            function () {
+
+                body.className =
+                    themeSelector.value;
+
+            }
+
+        );
+
+
+
+        button.addEventListener(
+
+            "click",
+
+            function () {
+
+                results.style.display = "none";
+
+
+
+                loading.innerHTML = `
+
+                    <p>Initializing Behavioral Instability Matrix...</p>
+
+                    <p>Running Chaos Spectrum Analysis...</p>
+
+                    <p>Calculating Neuro-chaotic Resonance...</p>
+
+                    <p>Cross-checking Digital Gremlin Index...</p>
+
+                `;
+
+
+
+                setTimeout(function () {
+
+                    scanPersonality();
+
+                }, 2500);
+
+            }
+
+        );
+
+
+
+        function scanPersonality() {
+
+
+
+            let text = input.value;
+
+
+
+            text = text.toLowerCase();
+
+
+
+            text = text.replaceAll("4", "a");
+
+            text = text.replaceAll("3", "e");
+
+            text = text.replaceAll("1", "i");
+
+            text = text.replaceAll("0", "o");
+
+            text = text.replaceAll("5", "s");
+
+            text = text.replaceAll("7", "t");
+
+
+
+            let goblinScore = 0;
+
+            let villainScore = 0;
+
+            let sleepScore = 0;
+
+            let memeScore = 0;
+
+            let rageScore = 0;
+
+            let socialBattery =
+                Math.floor(Math.random() * 100);
+
+
+
+            if (text.includes("chaos")) {
+
+                goblinScore += 25;
+            }
+
+            if (text.includes("lmao")) {
+
+                goblinScore += 20;
+
+                memeScore += 20;
+            }
+
+            if (text.includes("hehe")) {
+
+                goblinScore += 10;
+            }
+
+            if (text.includes("coffee")) {
+
+                sleepScore += 30;
+            }
+
+            if (text.includes("sleep")) {
+
+                sleepScore += 20;
+            }
+
+            if (text.includes("revenge")) {
+
+                villainScore += 40;
+            }
+
+            if (text.includes("power")) {
+
+                villainScore += 25;
+            }
+
+
+
+            let specialCount = 0;
+
+
+
+            for (let char of text) {
+
+                if (
+
+                    char === "!" ||
+
+                    char === "@" ||
+
+                    char === "#" ||
+
+                    char === "$" ||
+
+                    char === "%" ||
+
+                    char === "&"
+
+                ) {
+
+                    specialCount++;
+                }
+
+            }
+
+
+
+            goblinScore += specialCount * 5;
+
+
+
+            let uppercaseCount = 0;
+
+
+
+            for (let char of input.value) {
+
+                if (char >= "A" && char <= "Z") {
+
+                    uppercaseCount++;
+                }
+
+            }
+
+
+
+            villainScore += uppercaseCount * 2;
+
+
+
+            let vowelCount = 0;
+
+
+
+            for (let char of text) {
+
+                if (
+
+                    char === "a" ||
+
+                    char === "e" ||
+
+                    char === "i" ||
+
+                    char === "o" ||
+
+                    char === "u"
+
+                ) {
+
+                    vowelCount++;
+                }
+
+            }
+
+
+
+            let vowelRatio = 0;
+
+
+
+            if (text.length > 0) {
+
+                vowelRatio =
+                    vowelCount / text.length;
+            }
+
+
+
+            if (vowelRatio < 0.25) {
+
+                goblinScore += 30;
+            }
+
+
+
+            goblinScore +=
+                Math.floor(Math.random() * 15);
+
+            villainScore +=
+                Math.floor(Math.random() * 10);
+
+            sleepScore +=
+                Math.floor(Math.random() * 20);
+
+            memeScore +=
+                Math.floor(Math.random() * 40);
+
+            rageScore +=
+                Math.floor(Math.random() * 50);
+
+
+
+            goblinScore =
+                Math.min(goblinScore, 100);
+
+            villainScore =
+                Math.min(villainScore, 100);
+
+            sleepScore =
+                Math.min(sleepScore, 100);
+
+
+
+            let diagnosisText = "";
+
+
+
+            if (goblinScore > 70) {
+
+                diagnosisText =
+                    "Subject displays advanced raccoon-level chaos tendencies.";
+            }
+
+            else if (villainScore > 70) {
+
+                diagnosisText =
+                    "Subject likely to explain evil plans dramatically.";
+            }
+
+            else {
+
+                diagnosisText =
+                    "Subject appears unstable but functional.";
+            }
+
+
+
+            let threat = "LOW";
+
+
+
+            if (
+
+                goblinScore > 60 ||
+
+                villainScore > 60
+
+            ) {
+
+                threat = "MODERATE";
+            }
+
+
+
+            if (
+
+                goblinScore > 85 ||
+
+                villainScore > 85
+
+            ) {
+
+                threat = "SEVERE";
+            }
+
+
+
+            loading.innerHTML = "";
+
+            results.style.display = "block";
+
+
+
+            document.getElementById("goblinText").innerHTML =
+
+                `Goblin Energy: ${goblinScore}%`;
+
+
+
+            document.getElementById("villainText").innerHTML =
+
+                `Villain Probability: ${villainScore}%`;
+
+
+
+            document.getElementById("sleepText").innerHTML =
+
+                `Sleep Deprivation Index: ${sleepScore}%`;
+
+
+
+            document.getElementById("diagnosis").innerHTML =
+
+                diagnosisText;
+
+
+
+            document.getElementById("threatLevel").innerHTML =
+
+                `THREAT LEVEL: ${threat}`;
+
+
+
+            document.getElementById("cardGoblin").innerHTML =
+
+                `Goblin Energy: ${goblinScore}%`;
+
+
+
+            document.getElementById("cardVillain").innerHTML =
+
+                `Villain Probability: ${villainScore}%`;
+
+
+
+            document.getElementById("cardSleep").innerHTML =
+
+                `Sleep Deprivation: ${sleepScore}%`;
+
+
+
+            document.getElementById("cardThreat").innerHTML =
+
+                `Threat To Society: ${threat}`;
+
+
+
+            if (radarChart) {
+
+                radarChart.destroy();
+            }
+
+            if (pieChart) {
+
+                pieChart.destroy();
+            }
+
+            if (lineChart) {
+
+                lineChart.destroy();
+            }
+
+
+
+            radarChart = new Chart(
+
+                document.getElementById("radarChart"),
+
+                {
+
+                    type: "radar",
+
+                    data: {
+
+                        labels: [
+
+                            "Villainy",
+
+                            "Sleep Debt",
+
+                            "Meme Consumption",
+
+                            "Social Battery",
+
+                            "Keyboard Rage",
+
+                            "Goblin Energy"
+
+                        ],
+
+                        datasets: [{
+
+                            label: "Behavioral Analysis",
+
+                            data: [
+
+                                villainScore,
+
+                                sleepScore,
+
+                                memeScore,
+
+                                socialBattery,
+
+                                rageScore,
+
+                                goblinScore
+
+                            ]
+
+                        }]
+
+                    }
+
+                }
+
+            );
+
+
+
+            pieChart = new Chart(
+
+                document.getElementById("pieChart"),
+
+                {
+
+                    type: "pie",
+
+                    data: {
+
+                        labels: [
+
+                            "Caffeine",
+
+                            "Memes",
+
+                            "Panic",
+
+                            "Functional Human"
+
+                        ],
+
+                        datasets: [{
+
+                            data: [
+
+                                sleepScore,
+
+                                memeScore,
+
+                                rageScore,
+
+                                socialBattery
+
+                            ]
+
+                        }]
+
+                    }
+
+                }
+
+            );
+
+
+
+            lineChart = new Chart(
+
+                document.getElementById("lineChart"),
+
+                {
+
+                    type: "line",
+
+                    data: {
+
+                        labels: [
+
+                            "Monday",
+
+                            "Tuesday",
+
+                            "Wednesday",
+
+                            "Thursday",
+
+                            "Friday",
+
+                            "Saturday"
+
+                        ],
+
+                        datasets: [{
+
+                            label: "Sleep Quality",
+
+                            data: [
+
+                                90,
+
+                                70,
+
+                                60,
+
+                                40,
+
+                                25,
+
+                                sleepScore
+
+                            ]
+
+                        }]
+
+                    }
+
+                }
+
+            );
+
+        }
+
+
+
+        document.getElementById("downloadBtn")
+
+            .addEventListener(
+
+                "click",
+
+                function () {
+
+
+
+                    html2canvas(card)
+
+                        .then(function (canvas) {
+
+
+
+                            const link =
+                                document.createElement("a");
+
+
+
+                            link.download =
+                                "chaos-scan-results.png";
+
+
+
+                            link.href =
+                                canvas.toDataURL();
+
+
+
+                            link.click();
+
+                        });
+
+                }
+
+            );
+
+
+
+        const matrixCanvas =
+            document.getElementById("matrixCanvas");
+
+        const ctx =
+            matrixCanvas.getContext("2d");
+
+
+
+        matrixCanvas.width =
+            window.innerWidth;
+
+        matrixCanvas.height =
+            window.innerHeight;
+
+
+
+        const letters =
+            "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%^&*";
+
+
+
+        const fontSize = 14;
+
+        const columns =
+            matrixCanvas.width / fontSize;
+
+
+
+        const drops = [];
+
+
+
+        for (let i = 0; i < columns; i++) {
+
+            drops[i] = 1;
+        }
+
+
+
+        function getMatrixColor() {
+
+            if (body.className === "lab") {
+
+                return "#bb66ff";
+            }
+
+            else if (
+
+                body.className === "corporate"
+
+            ) {
+
+                return "#00ccff";
+            }
+
+            else {
+
+                return "#00ff66";
+            }
+
+        }
+
+
+
+        function drawMatrix() {
+
+
+
+            ctx.fillStyle =
+                "rgba(0,0,0,0.05)";
+
+            ctx.fillRect(
+
+                0,
+
+                0,
+
+                matrixCanvas.width,
+
+                matrixCanvas.height
+
+            );
+
+
+
+            ctx.fillStyle =
+                getMatrixColor();
+
+            ctx.font =
+                fontSize + "px monospace";
+
+
+
+            for (
+
+                let i = 0;
+
+                i < drops.length;
+
+                i++
+
+            ) {
+
+                const text =
+                    letters.charAt(
+
+                        Math.floor(
+
+                            Math.random() *
+
+                            letters.length
+
+                        )
+
+                    );
+
+
+
+                ctx.fillText(
+
+                    text,
+
+                    i * fontSize,
+
+                    drops[i] * fontSize
+
+                );
+
+
+
+                if (
+
+                    drops[i] * fontSize >
+
+                    matrixCanvas.height &&
+
+                    Math.random() > 0.975
+
+                ) {
+
+                    drops[i] = 0;
+                }
+
+
+
+                drops[i]++;
+            }
+
+        }
+
+
+
+        setInterval(drawMatrix, 35);
+
+    </script>
+
+</body>
+
+</html>
